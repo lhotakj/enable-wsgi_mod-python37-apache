@@ -4,7 +4,7 @@ Big thanks to [Graham Dumpleton](https://github.com/GrahamDumpleton) and his pro
 Feel free to share or modify it as you need. You might want to update Python version or wsgi_module variable to newer version once they become available.
 
 ### Requirements 
-- Centos / RedHat distro with sudo
+- Centos / RedHat distro with sudo rights
 - [Ansible](https://www.ansible.com/)
 ```
 sudo yum install epel-release
@@ -12,8 +12,8 @@ sudo yum install ansible
 ```
 
 ### Installation
-Simply run ansible playbook `install.yaml`
-
+Simply run ansible playbook `install.yaml`. 
+Please note the installation stops if Python version 3.7.3 is installed already.  
 ```
 ansible-playbook ./install.yaml
 ```
@@ -22,7 +22,7 @@ ansible-playbook ./install.yaml
 Remove all softlinks, folders and files created, restart Apache
 
 ### TO DO List
-1. Pre install check validates only if Python 3.7.3 is installed, `mod_wsgi` is not detected 
+1. Pre install check validates only if Python 3.7.3 is installed, but does not check `mod_wsgi` version
 2. Limited OS support. PR welcomed :) 
 3. No ansible playbook for uninstall
 
