@@ -34,6 +34,6 @@ Server: Apache/2.4.6 (CentOS) mod_wsgi/4.6.5 Python/3.7 PHP/7.2.20
 
 ### TO DO List
 1. Pre install check validates only if Python 3.7.3 is installed, but does not check `mod_wsgi` version
-2. Limited OS support. PR welcomed :) 
+2. Limited OS support. PR welcome :) 
 3. No ansible playbook for uninstall
 
