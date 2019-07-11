@@ -1,0 +1,104 @@
+---
+
+- name: Install Python 3.7.3 + mod_wsgi 4.6.5
+  hosts: 127.0.0.1
+  connection: local
+  become: yes
+  become_user: root
+  become_method: su
+  vars:
+    python_version: "3.7.3"
+    install_url: "https://www.python.org/ftp/python/"
+    mod_wsgi_source_url: "https://github.com/GrahamDumpleton/mod_wsgi/archive"
+    mod_wsgi_source_version: "4.6.5"
+
+  tasks:
+  - name: Detecting python3 ...
+    shell: "python3 --version 2>&1"
+    ignore_errors: true
+    register: ver
+
+  - name: "Evaluating python3 version ..."
+    set_fact:
+      is_update_needed: "{{ ( ver.stdout_lines[0] != 'Python ' + python_version)  }}"
+
+  - meta: end_play
+    when: not is_update_needed
+
+  - name: "Installing required yum packages for Python {{ python_version }} compilation ..."
+    yum:
+      name:
+        - zlib-devel
+        - libffi-devel
+        - openssl-devel
+        - gcc
+        - gcc-c++
+      state: present
+
+  - name: "Downloading source from {{ install_url }} ..."
+    shell: |
+      cd /usr/src
+      wget {{ install_url }}/{{ python_version }}/Python-{{ python_version }}.tgz
+      tar xzf Python-{{ python_version }}.tgz
+
+  - name: "Compile - configure"
+    shell: |
+      cd /usr/src/Python-{{ python_version }}
+      ./configure --prefix=/usr/bin/python3.7 --with-ensurepip=yes --enable-silent-rules --disable-tests --enable-shared
+
+  - name: "Compile - make install"
+    shell: |
+      export LD_RUN_PATH=/usr/bin/python3.7/lib
+      CORES=`nproc --all`
+      cd /usr/src/Python-{{ python_version }}
+      make install -j $CORES
+      rm -f /usr/src/Python-{{ python_version }}.tgz
+
+  - name: "Finalizing installation"
+    shell: |
+      echo -e "\n# Path to python {{ python_version }} (ansible-python37) " >> /etc/bashrc
+      echo -e "export PATH=\"\$PATH:/usr/bin/python3.7/bin\"" >> /etc/bashrc
+      ln -sf /usr/bin/python3.7/bin/pip3 /usr/bin/pip3
+      ln -sf /usr/bin/python3.7/bin/pip3.7 /usr/bin/pip3.7
+      ln -sf /usr/bin/python3.7/bin/python3.7 /usr/bin/python3.7
+      ln -sf /usr/bin/python3.7/bin/python3.7m /usr/bin/python3.7m
+      ln -sf /usr/bin/python3.7/bin/python3.7 /usr/bin/python3
+
+  - name: "Installing and updating pip"
+    shell: |
+      sudo /usr/src/Python-{{ python_version }}/python -m ensurepip
+      sudo /usr/src/Python-{{ python_version }}/python -m pip install -q --upgrade pip
+
+  - name: "Installing httpd and httpd-devel"
+    yum:
+      name:
+        - httpd
+        - httpd-devel
+      state: present
+
+  - name: "Downloading mod_wsgi from {{ mod_wsgi_source_url }} and compiling ..."
+    shell: |
+      mkdir -f /tmp/m
+      cd /tmp/m
+      wget --quiet {{ mod_wsgi_source_url }}/{{ mod_wsgi_source_version }}.tar.gz
+      tar xvfz ./{{ mod_wsgi_source_version }}.tar.gz
+      cd mod_wsgi-{{ mod_wsgi_source_version }}/
+      ./configure --with-apxs=/bin/apxs --with-python=/usr/bin/python3.7/bin/python3.7
+      make
+      sudo make install
+      cd /
+      rm -rf /tmp/m
+
+  - name: "Adding shared object libpython3.7m.so.1.0 to /lib"
+    shell: |
+      sudo ln -sf /usr/bin/python3.7/lib/libpython3.7m.so.1.0 /lib/libpython3.7m.so.1.0
+      sudo ln -sf /usr/bin/python3.7/lib/libpython3.7m.so.1.0 /lib64/libpython3.7m.so.1.0
+
+  - name: "Adding mod_wsgi to Apache"
+    shell: |
+      sudo echo -e "# This file loads custom built mod_wsgi {{ mod_wsgi_source_version }} with Python {{ python_version }}\n\nLoadModule wsgi_module modules/mod_wsgi.so\n\n" >> /etc/httpd/conf.modules.d/10-python-{{ python_version }}-wsgi-{{ mod_wsgi_source_version }}.conf
+
+  - name: "Restarting Apache"
+    shell: |
+      apachectl restart
+
