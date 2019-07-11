@@ -1,6 +1,6 @@
 # enable-wsgi_mod-python37-apache
 ## A simple Ansible script compiling Python 3.7.3 with mod_wsgi and configuring it in Apache
-Big thanks to [Graham Dumpleton](https://github.com/GrahamDumpleton) and his project https://github.com/GrahamDumpleton/mod_wsgi
+Big thanks to [Graham Dumpleton](https://github.com/GrahamDumpleton) and his project https://github.com/GrahamDumpleton/mod_wsgi.
 Feel free to share or modify it as you need. You might want to update Python version or wsgi_module variable to newer version once they become available.
 
 ### Requirements 
