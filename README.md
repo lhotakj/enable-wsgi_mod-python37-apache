@@ -1,2 +1,28 @@
 # enable-wsgi_mod-python37-apache
-Simple Ansible script compiling Python 3.7 with mod_wscgi and configuring both in Apache
+## A simple Ansible script compiling Python 3.7.3 with mod_wsgi and configuring it in Apache
+Big thanks to [Graham Dumpleton](https://github.com/GrahamDumpleton) and his project https://github.com/GrahamDumpleton/mod_wsgi
+Feel free to share or modify it as you need. You might want to update Python version or wsgi_module variable to newer version once they become available.
+
+### Requirements 
+- Centos / RedHat distro with sudo
+- [Ansible](https://www.ansible.com/)
+```
+sudo yum install epel-release
+sudo yum install ansible
+```
+
+### Installation
+Simply run ansible playbook `install.yaml`
+
+```
+ansible-playbook ./install.yaml
+```
+
+### Uninstall
+Remove all softlinks, folders and files created, restart Apache
+
+### TO DO List
+1. Pre install check validates only if Python 3.7.3 is installed, `mod_wsgi` is not detected 
+2. Limited OS support. PR welcomed :) 
+3. No ansible playbook for uninstall
+
