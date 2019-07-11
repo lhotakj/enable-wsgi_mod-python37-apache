@@ -21,6 +21,17 @@ ansible-playbook ./install.yaml
 ### Uninstall
 Remove all softlinks, folders and files created, restart Apache
 
+### Post-install check
+To make sure the mod_wsgi is loaded, check the HTTP header `Server`. Assuming your webserver runs at port 80
+```
+curl -s -I -X GET http://localhost | grep "Server:"
+```
+the output should contain `wsgi_mod/` and `Python/` with proper versions.
+```
+Server: Apache/2.4.6 (CentOS) mod_wsgi/4.6.5 Python/3.7 PHP/7.2.20
+```
+
+
 ### TO DO List
 1. Pre install check validates only if Python 3.7.3 is installed, but does not check `mod_wsgi` version
 2. Limited OS support. PR welcomed :) 
