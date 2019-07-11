@@ -56,7 +56,7 @@
 
   - name: "Finalizing installation"
     shell: |
-      echo -e "\n# Path to python {{ python_version }} (ansible-python37) " >> /etc/bashrc
+      echo -e "\n# Path to python {{ python_version }} " >> /etc/bashrc
       echo -e "export PATH=\"\$PATH:/usr/bin/python3.7/bin\"" >> /etc/bashrc
       ln -sf /usr/bin/python3.7/bin/pip3 /usr/bin/pip3
       ln -sf /usr/bin/python3.7/bin/pip3.7 /usr/bin/pip3.7
